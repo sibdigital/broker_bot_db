@@ -145,3 +145,36 @@ create table REG_SENT_MESSAGE
     settings jsonb
 )
 ;
+
+create or replace view V_MESSENGER_USER_MESSAGE_ROUTE as (
+    select *
+    from (
+             select mr.id_bot,
+                    mr.id_messenger,
+                    mr.id_event_type,
+                    mr.id_target_system,
+                    (select id_parent
+                     from cls_event_type as et
+                     where et.uuid = mr.id_event_type) as id_parent_event_type,
+                    mr.id_user                         as id_user
+             FROM reg_message_route as mr
+             where mr.is_deleted = false
+               and not mr.date_activation is null
+         ) as mr
+             inner join (select id_user  as id_user,
+                                outer_id,
+                                settings as user_settings
+                         from reg_messenger_user as mu
+                         where mu.is_deleted = false
+    ) as mu
+                        using (id_user)
+             inner join(
+        select uuid     as id_bot,
+               name     as bot_name,
+               settings as bot_settings
+        from cls_bot as b
+        where is_deleted = false
+    ) as b
+                       using (id_bot)
+)
+;
