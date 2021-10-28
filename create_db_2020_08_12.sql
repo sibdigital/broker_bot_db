@@ -178,3 +178,8 @@ create or replace view V_MESSENGER_USER_MESSAGE_ROUTE as (
                        using (id_bot)
 )
 ;
+--Правки таблиц в ходе разработки
+alter table cls_event_type alter column code type varchar(25) using code::varchar(25)
+;
+alter table reg_incom_request add request_body text
+;
