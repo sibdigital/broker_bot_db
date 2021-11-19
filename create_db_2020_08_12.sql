@@ -183,3 +183,17 @@ alter table cls_event_type alter column code type varchar(25) using code::varcha
 ;
 alter table reg_incom_request add request_body text
 ;
+--Добавлена функция по чтению сообщений с их временным переводов в статус блокировки
+CREATE OR REPLACE FUNCTION get_sent_messages(p_finded_status int, p_temporary_status int)
+RETURNS SETOF reg_sent_message LANGUAGE plpgsql VOLATILE AS $$
+BEGIN
+
+  RETURN QUERY update reg_sent_message
+  set status = p_temporary_status
+  where status = p_finded_status
+  returning *
+  ;
+  RETURN;
+END;
+$$
+;
